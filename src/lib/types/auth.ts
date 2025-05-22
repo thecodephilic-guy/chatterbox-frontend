@@ -4,15 +4,24 @@ export interface LoginCredentials {
 }
 
 export interface SignupCredentials {
+  name: string;
   username: string;
   password: string;
+  gender: string;
 }
 
 export interface AuthResponse {
+  status: number;
+  messages: string;
   token: string;
-  user: {
+  data: {
     id: string;
     name: string;
-    email: string;
+    username: string;
+    gender: string;
+    lastSeen: string | null;
+    updatedAt: string;
+    createdAt: string;
+    deletedAt: string | null;
   };
 }
