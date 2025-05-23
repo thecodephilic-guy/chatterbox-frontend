@@ -4,7 +4,7 @@ import { SignupCredentials, LoginCredentials, AuthResponse } from "@/lib/types/a
 class Auth {
   async signUp(credentials: SignupCredentials) {
     try {
-      const response : AuthResponse = await apiClient.post("/auth/singup/", credentials);
+      const response : AuthResponse = await apiClient.post("/auth/signup/", credentials);
 
       return response.data;
     } catch (error) {
@@ -25,7 +25,6 @@ class Auth {
   async login(credentials: LoginCredentials) {
     try {
       const response : AuthResponse = await apiClient.post("/auth/login/", credentials);
-        console.log(response.data);
         
       return response.data;
     } catch (error) {

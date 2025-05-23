@@ -1,7 +1,5 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { useTranslation } from "react-i18next"
-import "@/app/i18n"
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -12,7 +10,6 @@ export interface InputProps
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, label, error, available, ...props }, ref) => {
-    const {t} = useTranslation();
     return (
       <div className="space-y-2">
         {label && (
@@ -31,10 +28,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {error && (
-          <p className="text-sm text-red-500">{t(error)}</p>
+          <p className="text-sm text-red-500">{error}</p>
         )}
         {available &&(
-          <p className="text-sm text-green-500">{t('available')}</p>
+          <p className="text-sm text-green-500">Available</p>
         )}
       </div>
     )

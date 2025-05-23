@@ -3,41 +3,50 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { SignupCredentials } from "@/lib/types/auth";
 import { Eye, EyeOff } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import "@/app/i18n";
-import authService from "@/services/auth-service";
 
-function SignupForm() {
+interface SignupProps {
+  onSubmit: (data: SignupCredentials) => void;
+  loading?: boolean;
+  error?: string;
+}
 
-  const { t } = useTranslation();
+function SignupForm({ onSubmit, loading, error }: SignupProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const [isUsernameAvailable, setIsUsernameAvailable] =
-    useState<boolean>(false);
-  const [error, setError] = useState("");
+  const [isUsernameAvailable, setIsUsernameAvailable] = useState(false);
   const [formData, setFormData] = useState<SignupCredentials>({
     name: "",
     username: "",
     password: "",
-    gender: ""
+    gender: "",
   });
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
   return (
-    <form className="max-w-md w-full space-y-4 mx-auto">
+    <form className="max-w-md w-full space-y-4 mx-auto" onSubmit={handleSubmit}>
       <div>
         <Input
-          placeholder={t("name")}
+          placeholder="Name"
           name="name"
           value={formData.name}
-          onChange={(e) =>
-            setFormData({ ...formData, name: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
         />
       </div>
       <div>
         <Input
-          placeholder={t("username")}
+          placeholder="Username"
           name="username"
           value={formData.username}
           onChange={(e) =>
@@ -50,7 +59,7 @@ function SignupForm() {
 
       <div className="relative">
         <Input
-          placeholder={t("password")}
+          placeholder="Password"
           name="password"
           type={showPassword ? "text" : "password"}
           className="pr-2"
@@ -70,8 +79,22 @@ function SignupForm() {
         </Button>
       </div>
 
+      <Select
+        value={formData.gender}
+        onValueChange={(value) => setFormData({ ...formData, gender: value })}
+      >
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Gender" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="male">Male</SelectItem>
+          <SelectItem value="female">Female</SelectItem>
+          <SelectItem value="other">Other</SelectItem>
+        </SelectContent>
+      </Select>
+
       <Button className="w-full" size="lg" type="submit">
-        {t("signUp")}
+        SignUp
       </Button>
     </form>
   );
