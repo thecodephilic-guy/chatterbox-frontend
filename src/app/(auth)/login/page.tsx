@@ -7,10 +7,13 @@ import { LoginCredentials, AuthResponse, FailedAuthResponse } from "@/lib/types/
 import authService from "@/services/auth-service";
 import { useRouter } from "next/navigation";
 import status from "http-status";
+import { useAuthStore } from "@/store/auth-store";
 
 function Login() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+   const setAuth = useAuthStore((state) => state.setAuth);
+    const setLoading = useAuthStore((state) => state.setLoading);
+    const setError = useAuthStore((state) => state.setError);
+
   const router = useRouter();
 
   const handleFormSubmit = async (data: LoginCredentials) => {
@@ -18,18 +21,20 @@ function Login() {
     try {
       const response = await authService.login(data) as AuthResponse & FailedAuthResponse;
       if (response.status === status.OK) {
+        setAuth(response.data, response.token);
         router.push("/chats");
       } else {
         setError(response.error);
       }
     } catch (error: any) {
       setError(error?.message || "An error occurred!");
+    }finally{
+       setLoading(false);
     }
-    setLoading(false);
   }
   
   return (
-    <LoginForm onSubmit={handleFormSubmit} loading={loading} error={error} />
+    <LoginForm onSubmit={handleFormSubmit} loading={useAuthStore((state) => state.loading)} error={useAuthStore((state) => state.error)} />
   )
 }
 

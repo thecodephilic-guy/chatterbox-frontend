@@ -9,10 +9,11 @@ import { Eye, EyeOff } from "lucide-react";
 interface LoginProps {
   onSubmit: (data: LoginCredentials) => void;
   loading?: boolean;
-  error?: string;
+  error?: string | null;
 }
 
 function LoginForm(props: LoginProps) {
+  
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<LoginCredentials>({
     username: "",
