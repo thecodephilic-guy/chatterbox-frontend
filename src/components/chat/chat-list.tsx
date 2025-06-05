@@ -1,22 +1,29 @@
 import React from "react";
 import ChatListItem from "@/components/chat/chat-list-item";
-import { Chat } from "@/lib/types/chat";
 import { useChatStore } from "@/store/chat-store";
+import ChatListItemSkeleton from "./skeletons/chat-list-item";
 
 function ChatList() {
   const chats = useChatStore((state) => state.filteredChats);
-
+  const isLoading = useChatStore((state) => state.loading);
+  const setActiveUser = useChatStore((state) => state.setActiveUser);
+  
   return (
     <>
       <div>
-        {chats.map((chat) => (
-          <ChatListItem
-            key={chat.chatId}
-            name={chat.name}
-            lastMessage={chat.lastMessage}
-            unreadCount={chat.unreadCount}
-          />
-        ))}
+        {chats.map((chat) =>
+          isLoading ? (
+            <ChatListItemSkeleton key={chat.chatId} />
+          ) : (
+            <ChatListItem
+              key={chat.chatId}
+              name={chat.name}
+              lastMessage={chat.lastMessage}
+              unreadCount={chat.unreadCount}
+              handleClick={() => setActiveUser(chat)}
+            />
+          )
+        )}
       </div>
     </>
   );

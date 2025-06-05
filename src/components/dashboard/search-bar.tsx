@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useChatStore } from "@/store/chat-store";
@@ -8,9 +8,11 @@ function SearchBar() {
   const searchTerm = useChatStore((state) => state.searchTerm);
   const clearSearch = useChatStore((state) => state.clearSearch);
 
-  if(searchTerm.length === 0){
-    clearSearch();
-  }
+  useEffect(() => {
+    if (searchTerm.length === 0) {
+      clearSearch();
+    }
+  }, [searchTerm.length]);
 
   return (
     <>

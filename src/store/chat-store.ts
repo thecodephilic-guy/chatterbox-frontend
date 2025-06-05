@@ -5,12 +5,16 @@ type ChatStore = {
   chats: Chat[];
   filteredChats: Chat[];
   searchTerm: string;
+  loading: boolean;
+  activeUser: Chat | null;
 };
 
 type ChatActions = {
   setChats: (chats: Chat[]) => void;
   setSearchTerm: (term: string) => void;
   clearSearch: () => void;
+  setLoading: (isLoading: boolean) => void;
+  setActiveUser: (chat: Chat) => void;
 };
 
 export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
@@ -18,6 +22,8 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
   chats: [],
   filteredChats: [],
   searchTerm: "",
+  loading: false,
+  activeUser: null,
 
   //actions:
   setChats: (chats) =>
@@ -31,7 +37,7 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
     const filtered = chats.filter((chat) =>
       chat.name.toLowerCase().includes(term.toLowerCase())
     );
-    
+
     set({ searchTerm: term, filteredChats: filtered });
   },
 
@@ -39,4 +45,13 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
     const { chats } = get();
     set({ searchTerm: "", filteredChats: chats });
   },
+  setLoading: (isLoading) =>
+    set({
+      loading: isLoading,
+    }),
+
+  setActiveUser: (chat: Chat) =>
+    set({
+      activeUser: chat
+    }),
 }));

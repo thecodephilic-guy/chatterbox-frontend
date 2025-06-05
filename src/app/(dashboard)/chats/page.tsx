@@ -6,17 +6,24 @@ import Sidebar from "@/components/dashboard/sidebar";
 import { useAuthStore } from "@/store/auth-store";
 import chatService from "@/services/chat-service";
 import { useChatStore } from "@/store/chat-store";
+import ChatWindow from "@/components/chat/chat-window";
+import useSocket from "@/hooks/useSocket";
 
 function Chats() {
   const setChats = useChatStore((state) => state.setChats);
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const currentUser = useAuthStore((state) => state.data);
+  const setChatsLoading = useChatStore((state) => state.setLoading);
+  const activeUser = useChatStore((state) => state.activeUser);
 
+  useSocket();
+  
   useEffect(() => {
     const fetchChats = async () => {
+      setChatsLoading(true);
       if (currentUser?.id) {
         const chats = await chatService.getAllChats(currentUser?.id);
         setChats(chats.chats);
+        setChatsLoading(false);
       }
     };
     fetchChats();
@@ -29,7 +36,7 @@ function Chats() {
         {/* Chat list sidebar */}
         <div
           className={`overflow-y-auto border-r ${
-            selectedChatId ? "hidden md:block" : "block"
+            activeUser?.id ? "hidden md:block" : "block"
           }`}
         >
           <Sidebar />
@@ -38,9 +45,11 @@ function Chats() {
         {/* Chat area */}
         <div
           className={`${
-            selectedChatId ? "block" : "hidden md:block"
+            activeUser?.id ? "block" : "hidden md:block"
           } md:col-span-2`}
-        ></div>
+        >
+          <ChatWindow />
+        </div>
       </div>
     </>
   );
