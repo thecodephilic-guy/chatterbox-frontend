@@ -3,7 +3,7 @@ import ChatHeader from "./chat-header";
 import { useChatStore } from "@/store/chat-store";
 
 function ChatWindow() {
-  const selectedChat = useChatStore((state) => state.activeUser);
+  const selectedChat = useChatStore((state) => state.selectedChat);
   const isChatLoading = useChatStore((state) => state.loading);
 
   return (

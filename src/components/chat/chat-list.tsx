@@ -6,7 +6,7 @@ import ChatListItemSkeleton from "./skeletons/chat-list-item";
 function ChatList() {
   const chats = useChatStore((state) => state.filteredChats);
   const isLoading = useChatStore((state) => state.loading);
-  const setActiveUser = useChatStore((state) => state.setActiveUser);
+  const setSelectedChat = useChatStore((state) => state.setSelectedChat);
   
   return (
     <>
@@ -20,7 +20,7 @@ function ChatList() {
               name={chat.name}
               lastMessage={chat.lastMessage}
               unreadCount={chat.unreadCount}
-              handleClick={() => setActiveUser(chat)}
+              handleClick={() => setSelectedChat(chat)}
             />
           )
         )}

@@ -7,3 +7,8 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface ActiveUsers {
+  userId: string;
+  socketId: string;
+};

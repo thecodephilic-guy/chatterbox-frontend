@@ -4,34 +4,17 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import { getFallBack } from "@/lib/utils/getFallback";
 import { useChatStore } from "@/store/chat-store";
 import { formatLastSeen } from "@/lib/utils/date-formatter";
-import SocketClient from "@/socket/socket-client";
-
-type ActiveUsers = {
-  userId: string;
-  socketId: string;
-}
 
 function ChatHeader() {
-  const selectedChat = useChatStore((state) => state.activeUser);
+  const selectedChat = useChatStore((state) => state.selectedChat);
+  const {activeUsers} = useChatStore();
 
-  const [isOnline, setIsOnline] = useState(false);
+   const [isOnline, setIsOnline] = useState<boolean | undefined>(false);
 
   useEffect(() => {
-    const socket = SocketClient.getInstance();
-
-    const handleGetUsers = (users: ActiveUsers[]) => {
-
-      
-      const online = users.some((user) => user.userId === selectedChat?.id);
-      setIsOnline(online);
-    };
-
-    socket.on("get-users", handleGetUsers);
-
-    return () => {
-      socket.off("get-users", handleGetUsers);
-    };
-  }, [selectedChat?.id,]);
+    const online = activeUsers?.some((user) => user.userId === selectedChat?.id);
+    setIsOnline(online);
+  }, [activeUsers, selectedChat]);
 
   return (
     <>

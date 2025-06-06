@@ -8,14 +8,31 @@ import chatService from "@/services/chat-service";
 import { useChatStore } from "@/store/chat-store";
 import ChatWindow from "@/components/chat/chat-window";
 import useSocket from "@/hooks/useSocket";
+import SocketClient from "@/socket/socket-client";
+import { ActiveUsers } from "@/lib/types/user";
 
 function Chats() {
   const setChats = useChatStore((state) => state.setChats);
   const currentUser = useAuthStore((state) => state.data);
   const setChatsLoading = useChatStore((state) => state.setLoading);
-  const activeUser = useChatStore((state) => state.activeUser);
+  const selectedChat = useChatStore((state) => state.selectedChat);
+  const setActiveUsers = useChatStore((state) => state.setActiveUsers);
 
   useSocket();
+
+ useEffect(() => {
+    const socket = SocketClient.getInstance();
+
+    const handleGetUsers = (users: ActiveUsers[]) => {
+      setActiveUsers(users);
+    };
+
+    socket.on("get-users", handleGetUsers);
+
+    return () => {
+      socket.off("get-users", handleGetUsers);
+    };
+  }, [currentUser]);
   
   useEffect(() => {
     const fetchChats = async () => {
@@ -36,7 +53,7 @@ function Chats() {
         {/* Chat list sidebar */}
         <div
           className={`overflow-y-auto border-r ${
-            activeUser?.id ? "hidden md:block" : "block"
+            selectedChat?.id ? "hidden md:block" : "block"
           }`}
         >
           <Sidebar />
@@ -45,7 +62,7 @@ function Chats() {
         {/* Chat area */}
         <div
           className={`${
-            activeUser?.id ? "block" : "hidden md:block"
+            selectedChat?.id ? "block" : "hidden md:block"
           } md:col-span-2`}
         >
           <ChatWindow />
