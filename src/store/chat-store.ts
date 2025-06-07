@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { Chat } from "@/lib/types/chat";
 import { ActiveUsers } from "@/lib/types/user";
 
-
 type ChatStore = {
   chats: Chat[];
   filteredChats: Chat[];
@@ -19,6 +18,7 @@ type ChatActions = {
   setLoading: (isLoading: boolean) => void;
   setSelectedChat: (chat: Chat) => void;
   setActiveUsers: (activeUsersData: ActiveUsers[]) => void;
+  clearSelectedChat: () => void;
 };
 
 export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
@@ -59,6 +59,6 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
     set({
       selectedChat: chat,
     }),
-  setActiveUsers: (activeUsers) =>
-    set({activeUsers}),
+  setActiveUsers: (activeUsers) => set({ activeUsers }),
+  clearSelectedChat: () => set({ selectedChat: null }),
 }));
