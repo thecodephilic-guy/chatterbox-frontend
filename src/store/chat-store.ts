@@ -9,6 +9,7 @@ type ChatStore = {
   loading: boolean;
   selectedChat: Chat | null;
   activeUsers: ActiveUsers[] | null;
+  typingUsers: string[] | null;
 };
 
 type ChatActions = {
@@ -19,6 +20,8 @@ type ChatActions = {
   setSelectedChat: (chat: Chat) => void;
   setActiveUsers: (activeUsersData: ActiveUsers[]) => void;
   clearSelectedChat: () => void;
+  setTypingUsers: (userId: string, isTyping: boolean) => void;
+
 };
 
 export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
@@ -29,6 +32,7 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
   loading: false,
   selectedChat: null,
   activeUsers: null,
+  typingUsers: null,
 
   //actions:
   setChats: (chats) =>
@@ -61,4 +65,17 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
     }),
   setActiveUsers: (activeUsers) => set({ activeUsers }),
   clearSelectedChat: () => set({ selectedChat: null }),
+
+  setTypingUsers: (userId, isTyping) => {
+    set((state) => {
+      const typingUsers = state.typingUsers ?? [];
+      const isAlreadyTyping = typingUsers.includes(userId);
+      if (isTyping && !isAlreadyTyping) {
+        return { typingUsers: [...typingUsers, userId] };
+      } else if (!isTyping && isAlreadyTyping) {
+        return { typingUsers: typingUsers.filter((id) => id !== userId) };
+      }
+      return state;
+    })
+  }
 }));

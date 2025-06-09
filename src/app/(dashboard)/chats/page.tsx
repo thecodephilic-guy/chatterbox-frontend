@@ -17,10 +17,30 @@ function Chats() {
   const setChatsLoading = useChatStore((state) => state.setLoading);
   const selectedChat = useChatStore((state) => state.selectedChat);
   const setActiveUsers = useChatStore((state) => state.setActiveUsers);
+  const { setTypingUsers } = useChatStore();
 
   useSocket();
 
- useEffect(() => {
+  useEffect(() => {
+    const socket = SocketClient.getInstance();
+
+    if (!socket) return;
+
+    socket.on("user-typing", (userId) => {
+      setTypingUsers(userId, true); // global state update
+    });
+
+    socket.on("user-stop-typing", (userId) => {
+      setTypingUsers(userId, false); // global state update
+    });
+
+    return () => {
+      socket.off("user-typing");
+      socket.off("user-stop-typing");
+    };
+  }, [selectedChat]);
+
+  useEffect(() => {
     const socket = SocketClient.getInstance();
 
     const handleGetUsers = (users: ActiveUsers[]) => {
@@ -33,7 +53,7 @@ function Chats() {
       socket.off("get-users", handleGetUsers);
     };
   }, [currentUser]);
-  
+
   useEffect(() => {
     const fetchChats = async () => {
       setChatsLoading(true);
