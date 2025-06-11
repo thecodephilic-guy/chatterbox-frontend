@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import { getFallBack } from "@/lib/utils/getFallback";
 import { useChatStore } from "@/store/chat-store";
 import { formatLastSeen } from "@/lib/utils/date-formatter";
+import userService from "@/services/user-service";
 
 function ChatHeader() {
   const selectedChat = useChatStore((state) => state.selectedChat);
@@ -11,6 +12,7 @@ function ChatHeader() {
   const {clearSelectedChat} = useChatStore();
 
   const [isOnline, setIsOnline] = useState<boolean | undefined>(false);
+  const [lastSeen, setLastSeen] = useState< string | null >(null);
 
   useEffect(() => {
     const online = activeUsers?.some(
@@ -18,6 +20,16 @@ function ChatHeader() {
     );
     setIsOnline(online);
   }, [activeUsers, selectedChat]);
+
+  useEffect(() => {
+    if (isOnline || !selectedChat?.id) return;
+
+    const fetchLastSeen = async () => {
+      const lastSeen = await userService.getLastSeen(selectedChat?.id);
+      setLastSeen(lastSeen);
+    };
+    fetchLastSeen();
+  }, [isOnline, selectedChat?.id]);
 
   const handleBack = () => {
     // window.history.back();

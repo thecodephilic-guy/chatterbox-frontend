@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SignupCredentials } from "@/lib/types/auth";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2Icon } from "lucide-react";
 
 interface SignupProps {
   onSubmit: (data: SignupCredentials) => void;
@@ -94,7 +94,7 @@ function SignupForm({ onSubmit, loading, error }: SignupProps) {
       </Select>
 
       <Button className="w-full" size="lg" type="submit">
-        SignUp
+        {loading ? <Loader2Icon /> : "SignUp"}
       </Button>
     </form>
   );

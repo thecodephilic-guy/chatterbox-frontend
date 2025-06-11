@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LoginCredentials } from "@/lib/types/auth";
 import { Eye, EyeOff } from "lucide-react";
+import { Loader2Icon } from "lucide-react";
 
 interface LoginProps {
   onSubmit: (data: LoginCredentials) => void;
@@ -13,7 +14,7 @@ interface LoginProps {
 }
 
 function LoginForm(props: LoginProps) {
-  
+
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<LoginCredentials>({
     username: "",
@@ -65,7 +66,7 @@ function LoginForm(props: LoginProps) {
           </Button>
         </div>
         <Button className="w-full" size="lg" type="submit">
-          Login
+          {loading ? <Loader2Icon /> : "Login"}
         </Button>
       </form>
     </>

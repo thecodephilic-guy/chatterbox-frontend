@@ -21,6 +21,7 @@ function Chats() {
 
   useSocket();
 
+
   useEffect(() => {
     const socket = SocketClient.getInstance();
 
