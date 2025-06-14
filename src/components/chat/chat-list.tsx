@@ -7,7 +7,7 @@ function ChatList() {
   const chats = useChatStore((state) => state.filteredChats);
   const isLoading = useChatStore((state) => state.loading);
   const setSelectedChat = useChatStore((state) => state.setSelectedChat);
-  
+    
   return (
     <>
       <div>

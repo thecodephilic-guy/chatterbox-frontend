@@ -16,20 +16,20 @@ function ChatHeader() {
 
   useEffect(() => {
     const online = activeUsers?.some(
-      (user) => user.userId === selectedChat?.id
+      (user) => user.userId === selectedChat?.userId
     );
     setIsOnline(online);
   }, [activeUsers, selectedChat]);
 
   useEffect(() => {
-    if (isOnline || !selectedChat?.id) return;
+    if (isOnline || !selectedChat?.userId) return;
 
     const fetchLastSeen = async () => {
-      const lastSeen = await userService.getLastSeen(selectedChat?.id);
+      const lastSeen = await userService.getLastSeen(selectedChat?.userId);
       setLastSeen(lastSeen);
     };
     fetchLastSeen();
-  }, [isOnline, selectedChat?.id]);
+  }, [isOnline, selectedChat?.userId]);
 
   const handleBack = () => {
     // window.history.back();

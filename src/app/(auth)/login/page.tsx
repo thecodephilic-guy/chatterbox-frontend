@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 import LoginForm from "@/components/auth/login-form";
 import {
@@ -12,11 +12,24 @@ import authService from "@/services/auth-service";
 import { useRouter } from "next/navigation";
 import status from "http-status";
 import { useAuthStore } from "@/store/auth-store";
+import { toast } from "sonner";
+import { stat } from "fs";
 
 function Login() {
   const setAuth = useAuthStore((state) => state.setAuth);
   const setLoading = useAuthStore((state) => state.setLoading);
   const setError = useAuthStore((state) => state.setError);
+  const authError = useAuthStore((state) => state.error);
+
+  useEffect(() => {
+    if (authError) {
+      toast.dismiss(); // Dismiss any previous toasts
+      toast(authError);
+    }
+    return () => {
+      setError("");
+    };
+  });
 
   const router = useRouter();
 

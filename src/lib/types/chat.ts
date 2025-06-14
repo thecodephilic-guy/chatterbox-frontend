@@ -1,7 +1,7 @@
 
 export interface Chat {
   chatId: string;
-  id: string;
+  userId: string;
   name: string;
   gender: 'male' | 'female' | 'other';
   lastMessage: string;

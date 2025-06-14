@@ -10,17 +10,23 @@ import ChatWindow from "@/components/chat/chat-window";
 import useSocket from "@/hooks/useSocket";
 import SocketClient from "@/socket/socket-client";
 import { ActiveUsers } from "@/lib/types/user";
+import { ChatResponse } from "@/lib/types/chat";
+import status from "http-status";
+import { redirect } from "next/navigation";
 
 function Chats() {
   const setChats = useChatStore((state) => state.setChats);
   const currentUser = useAuthStore((state) => state.data);
+  const setAuthError = useAuthStore((state) => state.setError);
   const setChatsLoading = useChatStore((state) => state.setLoading);
   const selectedChat = useChatStore((state) => state.selectedChat);
   const setActiveUsers = useChatStore((state) => state.setActiveUsers);
   const { setTypingUsers } = useChatStore();
+  const logout = useAuthStore((state) => state.logout);
 
   useSocket();
 
+  // logout();
 
   useEffect(() => {
     const socket = SocketClient.getInstance();
@@ -57,12 +63,19 @@ function Chats() {
 
   useEffect(() => {
     const fetchChats = async () => {
-      setChatsLoading(true);
-      if (currentUser?.id) {
-        const chats = await chatService.getAllChats(currentUser?.id);
-        setChats(chats.chats);
-        setChatsLoading(false);
+      if (!currentUser?.id) {
+        redirect("/login");
       }
+      const chats: ChatResponse = await chatService.getAllChats();
+      console.log(chats);
+
+      if (chats.status === status.OK) {
+        setChats(chats.chats);
+      } else {
+        setAuthError(chats.message);
+        redirect("/login");
+      }
+      setChatsLoading(false);
     };
     fetchChats();
   }, [currentUser]);
@@ -74,7 +87,7 @@ function Chats() {
         {/* Chat list sidebar */}
         <div
           className={`overflow-y-auto border-r ${
-            selectedChat?.id ? "hidden md:block" : "block"
+            selectedChat?.userId ? "hidden md:block" : "block"
           }`}
         >
           <Sidebar />
@@ -83,7 +96,7 @@ function Chats() {
         {/* Chat area */}
         <div
           className={`${
-            selectedChat?.id ? "block" : "hidden md:block"
+            selectedChat?.userId ? "block" : "hidden md:block"
           } md:col-span-2`}
         >
           <ChatWindow />

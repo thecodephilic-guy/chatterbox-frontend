@@ -1,10 +1,9 @@
 import apiClient from "./api-client";
 
 class Chat {
-    async getAllChats(id: string){
-        try {
-      const response = await apiClient.get(`/chats/user-chats/${id}`);
-
+  async getAllChats() {
+    try {
+      const response = await apiClient.get(`/chats/all`);
       return response.data;
     } catch (error) {
       if (
@@ -19,7 +18,7 @@ class Chat {
       }
       return { message: "An unknown error occurred." };
     }
-    }
+  }
 }
 
 const chatService = new Chat();
