@@ -25,7 +25,7 @@ const MessageBox: React.FC<MessageBoxProps> = ({
         className={clsx(
           "max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg px-4 py-2 rounded-xl text-sm shadow",
           isOwnMessage
-            ? "bg-blue-500 text-white rounded-br-none"
+            ? "bg-gray-500 text-white rounded-br-none"
             : "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white rounded-bl-none"
         )}
       >

@@ -9,27 +9,41 @@ import userService from "@/services/user-service";
 function ChatHeader() {
   const selectedChat = useChatStore((state) => state.selectedChat);
   const { activeUsers } = useChatStore();
-  const {clearSelectedChat} = useChatStore();
+  const { clearSelectedChat } = useChatStore();
 
   const [isOnline, setIsOnline] = useState<boolean | undefined>(false);
-  const [lastSeen, setLastSeen] = useState< string | null >(null);
+  const [lastSeen, setLastSeen] = useState<Date | null>(null);
 
   useEffect(() => {
+    if (!selectedChat?.userId) return;
+
     const online = activeUsers?.some(
       (user) => user.userId === selectedChat?.userId
     );
     setIsOnline(online);
-  }, [activeUsers, selectedChat]);
 
-  useEffect(() => {
-    if (isOnline || !selectedChat?.userId) return;
-
-    const fetchLastSeen = async () => {
-      const lastSeen = await userService.getLastSeen(selectedChat?.userId);
-      setLastSeen(lastSeen);
-    };
-    fetchLastSeen();
-  }, [isOnline, selectedChat?.userId]);
+    //if not online then fetch lastSeen:
+    if (!online) {
+      (async () => {
+        try {
+          const response = (await userService.getLastSeen(
+            selectedChat.userId
+          )) as { lastSeen: Date | null };
+          console.log(response);
+          
+          if (response?.lastSeen !== null) {
+            setLastSeen(new Date(response.lastSeen));
+          }else{
+            setLastSeen(null);
+          }
+        } catch (err) {
+          console.error("Failed to fetch last seen", err);
+        }
+      })();
+    } else {
+      setLastSeen(null); // Clear lastSeen if user is online
+    }
+  }, [activeUsers, selectedChat?.userId]);
 
   const handleBack = () => {
     // window.history.back();
@@ -72,9 +86,7 @@ function ChatHeader() {
               isOnline ? "text-green-700" : "text-gray-500"
             }  -translate-y-1 pt-1`}
           >
-            {isOnline
-              ? "Online"
-              : formatLastSeen(selectedChat?.updatedAt ?? "")}
+            {isOnline ? "Online" : lastSeen && formatLastSeen(lastSeen)}
           </h2>
         </div>
       </div>

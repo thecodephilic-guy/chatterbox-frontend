@@ -1,11 +1,16 @@
 import apiClient from "./api-client";
 
+
+interface lastSeenResponse {
+  lastSeen : Date | null;
+}
+
 class User {
   async getLastSeen(id: string | undefined) {
     try {
-      const response = await apiClient.get(`/users/get-user/${id}`);
-      
-      return response.data.data.lastSeen;
+      const res = await apiClient.get(`/users/last-seen/${id}`);
+      const response : lastSeenResponse = res.data;
+      return response;
     } catch (error) {
       if (
         error &&

@@ -63,19 +63,13 @@ function Chats() {
 
   useEffect(() => {
     const fetchChats = async () => {
-      if (!currentUser?.id) {
-        redirect("/login");
-      }
       const chats: ChatResponse = await chatService.getAllChats();
-      console.log(chats);
-
       if (chats.status === status.OK) {
         setChats(chats.chats);
       } else {
         setAuthError(chats.message);
         redirect("/login");
       }
-      setChatsLoading(false);
     };
     fetchChats();
   }, [currentUser]);

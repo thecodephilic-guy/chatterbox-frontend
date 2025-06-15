@@ -19,6 +19,10 @@ class Chat {
       return { message: "An unknown error occurred." };
     }
   }
+
+  async getMessages(){
+    
+  }
 }
 
 const chatService = new Chat();
