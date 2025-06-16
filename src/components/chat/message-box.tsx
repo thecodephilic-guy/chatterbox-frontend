@@ -1,17 +1,16 @@
 import React from "react";
 import clsx from "clsx";
+import { formatMessageDate } from "@/lib/utils/date-formatter";
 
 type MessageBoxProps = {
-  message: string;
+  content: string;
   isOwnMessage?: boolean;
-  senderName?: string;
-  timestamp?: string;
+  timestamp?: Date;
 };
 
 const MessageBox: React.FC<MessageBoxProps> = ({
-  message,
+  content,
   isOwnMessage = false,
-  senderName,
   timestamp,
 }) => {
   return (
@@ -29,16 +28,12 @@ const MessageBox: React.FC<MessageBoxProps> = ({
             : "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white rounded-bl-none"
         )}
       >
-        {senderName && !isOwnMessage && (
-          <p className="text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">
-            {senderName}
-          </p>
-        )}
-
-        <p className="whitespace-pre-line break-words">{message}</p>
+        <p className="whitespace-pre-line break-words">{content}</p>
 
         {timestamp && (
-          <p className="text-[10px] text-gray-400 mt-1 text-right">{timestamp}</p>
+          <p className="text-[10px] text-gray-400 mt-1 text-right">
+            {formatMessageDate(timestamp)}
+          </p>
         )}
       </div>
     </div>

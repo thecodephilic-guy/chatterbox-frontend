@@ -15,7 +15,7 @@ export function formatLastSeen(dateString: Date): string {
   return "A long time ago";
 }
 
-export function formatLastMessageDate(dateString: string): string {
+export function formatMessageDate(dateString: Date): string {
   const date = new Date(dateString);
   const now = new Date();
   const diffInMs = now.getTime() - date.getTime();

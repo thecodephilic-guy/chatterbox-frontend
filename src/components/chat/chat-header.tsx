@@ -29,7 +29,6 @@ function ChatHeader() {
           const response = (await userService.getLastSeen(
             selectedChat.userId
           )) as { lastSeen: Date | null };
-          console.log(response);
           
           if (response?.lastSeen !== null) {
             setLastSeen(new Date(response.lastSeen));

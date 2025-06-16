@@ -9,8 +9,24 @@ export interface Chat {
   unreadCount: number;
 }
 
+export interface Message {
+  id: string;
+  chatId: string;
+  senderId: string;
+  content: string;
+  messageType: string;
+  createdAt: Date;
+  isRead: boolean;
+}
+
 export interface ChatResponse {
   status: number;
   message: string;
   chats: Chat[];
+}
+
+export interface MessageResponse {
+  status: number;
+  message: string;
+  data: Message[];
 }
