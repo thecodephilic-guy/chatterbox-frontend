@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { Chat } from "@/lib/types/chat";
-import { ActiveUsers } from "@/lib/types/user";
+import { ActiveUsers, User } from "@/lib/types/user";
 
 type ChatStore = {
   chats: Chat[];
@@ -10,6 +10,8 @@ type ChatStore = {
   selectedChat: Chat | null;
   activeUsers: ActiveUsers[] | null;
   typingUsers: string[] | null;
+  allUsers: User[];
+  filteredUsers: User[];
 };
 
 type ChatActions = {
@@ -21,7 +23,7 @@ type ChatActions = {
   setActiveUsers: (activeUsersData: ActiveUsers[]) => void;
   clearSelectedChat: () => void;
   setTypingUsers: (userId: string, isTyping: boolean) => void;
-
+  setAllUsers: (users: User[]) => void;
 };
 
 export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
@@ -33,6 +35,8 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
   selectedChat: null,
   activeUsers: null,
   typingUsers: null,
+  allUsers: [],
+  filteredUsers: [],
 
   //actions:
   setChats: (chats) =>
@@ -66,6 +70,8 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
   setActiveUsers: (activeUsers) => set({ activeUsers }),
   clearSelectedChat: () => set({ selectedChat: null }),
 
+  setAllUsers: (users) => set({ allUsers: users, filteredUsers: users }),
+
   setTypingUsers: (userId, isTyping) => {
     set((state) => {
       const typingUsers = state.typingUsers ?? [];
@@ -76,6 +82,6 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
         return { typingUsers: typingUsers.filter((id) => id !== userId) };
       }
       return state;
-    })
-  }
+    });
+  },
 }));

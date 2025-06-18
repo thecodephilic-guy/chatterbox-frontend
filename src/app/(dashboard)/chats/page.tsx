@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useState } from "react";
 import Sidebar from "@/components/dashboard/sidebar";
 import { useAuthStore } from "@/store/auth-store";
 import chatService from "@/services/chat-service";

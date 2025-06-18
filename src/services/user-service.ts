@@ -1,3 +1,4 @@
+import { UsersResponse } from "@/lib/types/user";
 import apiClient from "./api-client";
 
 
@@ -10,6 +11,26 @@ class User {
     try {
       const res = await apiClient.get(`/users/last-seen/${id}`);
       const response : lastSeenResponse = res.data;
+      return response;
+    } catch (error) {
+      if (
+        error &&
+        typeof error === "object" &&
+        "response" in error &&
+        error.response &&
+        typeof error.response === "object" &&
+        "data" in error.response
+      ) {
+        return error.response.data;
+      }
+      return { message: "An unknown error occurred." };
+    }
+  }
+
+  async getAllUsers() {
+    try {
+      const res = await apiClient.get(`/users/all/`);
+      const response : UsersResponse = res.data;
       return response;
     } catch (error) {
       if (
