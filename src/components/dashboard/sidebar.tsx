@@ -6,12 +6,15 @@ import { MessageSquarePlus } from "lucide-react";
 import { UsersResponse } from "@/lib/types/user";
 import userService from "@/services/user-service";
 import { useChatStore } from "@/store/chat-store";
+import { useAuthStore } from "@/store/auth-store";
 
 function Sidebar() {
   const { setAllUsers } = useChatStore();
+  const loggedInUser = useAuthStore((state) => state.data);
 
   const handleOnClick = async () => {
     const response = await userService.getAllUsers() as UsersResponse;
+    response.data = response.data.filter((user) => user.id !== loggedInUser?.id); //removing self
     setAllUsers(response.data);
   }
   
