@@ -1,43 +1,33 @@
-
 export interface ServerToClientEvents {
-  'get-users': (users: []) => void;
-  'receive-message': (message: Message) => void;
-  'user-typing': (userId: string) => void;
-  'user-stop-typing': (userId: string) => void;
+  "message:receive": (response: SocketResponse) => void;
+  "users:active": (response: SocketResponse) => void;
+  "users:typing": (response: SocketResponse) => void;
 }
 
 export interface ClientToServerEvents {
-  'add-new-user': (userId: string) => void;
-  'send-message': (data: SendMessagePayload) => void;
-  'user-typing': (data: TypingPayload) => void;
-  'user-stop-typing': (data: TypingPayload) => void;
+  "message:send": (
+    paylaod: MessagePayload,
+    callback: (response: SocketResponse) => void
+  ) => void;
+
+  "user:typing": (payload: TypingPayload) => void
 }
 
-// Define additional interfaces as needed
-export interface ActiveUser {
-  userId: string;
-  socketId: string;
-  isTyping?: boolean;
-}
-
-export interface Message {
-  id: string;
-  chatId: string;
-  senderId: string;
-  content: string;
-  messageType: 'text' | 'image' | 'video'; 
-  createdAt: string;
-  isRead: boolean;
-}
-
-export interface SendMessagePayload {
-  receiverId: string;
-  chatId: string;
-  senderId: string;
+export interface SocketResponse {
+  status: string;
   message: string;
+  error?: string;
+  data: any;
 }
 
-export interface TypingPayload {
-  userId: string;
+interface MessagePayload {
+  chatId: string;
+  receiverId: string;
+  content: string;
+  messageType?: "text" | "image" | "video";
+}
+
+interface TypingPayload {
+  senderId: string;
   receiverId: string;
 }

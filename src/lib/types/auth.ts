@@ -13,7 +13,7 @@ export interface SignupCredentials {
 export interface AuthResponse {
   status: number;
   message: string;
-  token: string;
+  error?: string;
   data: {
     id: string;
     name: string;
@@ -24,9 +24,4 @@ export interface AuthResponse {
     createdAt: string;
     deletedAt: string | null;
   };
-}
-
-export interface FailedAuthResponse {
-  status: number;
-  error: string;
 }

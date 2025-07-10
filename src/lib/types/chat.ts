@@ -5,7 +5,8 @@ export interface Chat {
   name: string;
   gender: 'male' | 'female' | 'other';
   lastMessage: string;
-  updatedAt?: string; 
+  lastMessageType: string;
+  messageTime: Date;
   unreadCount: number;
 }
 
@@ -22,11 +23,6 @@ export interface Message {
 export interface ChatResponse {
   status: number;
   message: string;
-  chats: Chat[];
-}
-
-export interface MessageResponse {
-  status: number;
-  message: string;
-  data: Message[];
+  error?: string;
+  data: any;
 }

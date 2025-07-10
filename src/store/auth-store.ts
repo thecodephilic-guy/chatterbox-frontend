@@ -14,17 +14,16 @@ type Data = {
 
 type State = {
   data: Data | null;
-  token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
-  error: string | null;
+  authError: string | null;
 };
 
 type Actions = {
-  setAuth: (data: Data, token: string) => void;
+  setAuth: (data: Data) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
-  setError: (message: string | null) => void;
+  setAuthError: (message: string | null) => void;
 };
 
 export const useAuthStore = create<State & Actions>()(
@@ -35,27 +34,28 @@ export const useAuthStore = create<State & Actions>()(
       token: null,
       isAuthenticated: false,
       loading: false,
-      error: null,
+      authError: null,
 
       //defining actions:
-      setAuth: (data, token) =>
+      setAuth: (data) =>
         set({
           data,
-          token,
           isAuthenticated: true,
           loading: false,
-          error: null,
+          authError: null,
         }),
+
       logout: () =>
         set({
           data: null,
-          token: null,
           isAuthenticated: false,
           loading: false,
-          error: null,
+          authError: null,
         }),
+
       setLoading: (loading) => set({ loading }),
-      setError: (message) => set({ error: message }),
+      
+      setAuthError: (message) => set({ authError: message }),
     }),
     {
       name: "chatterbox-auth-storage",

@@ -12,7 +12,6 @@ interface ChatListItemProps {
 function ChatListItem(props: ChatListItemProps) {
   const { name, lastMessage, unreadCount, handleClick } = props;
 
-
   return (
     <>
       <div

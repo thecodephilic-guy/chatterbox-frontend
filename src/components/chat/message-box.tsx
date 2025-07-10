@@ -1,6 +1,6 @@
 import React from "react";
 import clsx from "clsx";
-import { formatMessageDate } from "@/lib/utils/date-formatter";
+import TimeAgo from "@/lib/utils/format-time";
 
 type MessageBoxProps = {
   content: string;
@@ -32,7 +32,7 @@ const MessageBox: React.FC<MessageBoxProps> = ({
 
         {timestamp && (
           <p className="text-[10px] text-gray-400 mt-1 text-right">
-            {formatMessageDate(timestamp)}
+            <TimeAgo timestamp={timestamp} />
           </p>
         )}
       </div>

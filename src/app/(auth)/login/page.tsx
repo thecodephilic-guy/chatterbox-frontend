@@ -1,51 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import React from "react";
 import LoginForm from "@/components/auth/login-form";
-import {
-  LoginCredentials,
-  AuthResponse,
-  FailedAuthResponse,
-} from "@/lib/types/auth";
+import { LoginCredentials, AuthResponse } from "@/lib/types/auth";
 import authService from "@/services/auth-service";
 import { useRouter } from "next/navigation";
-import status from "http-status";
 import { useAuthStore } from "@/store/auth-store";
 import { toast } from "sonner";
-import { stat } from "fs";
 
 function Login() {
-  const setAuth = useAuthStore((state) => state.setAuth);
-  const setLoading = useAuthStore((state) => state.setLoading);
-  const setError = useAuthStore((state) => state.setError);
-  const authError = useAuthStore((state) => state.error);
-
-  useEffect(() => {
-    if (authError) {
-      toast.dismiss(); // Dismiss any previous toasts
-      toast(authError);
-    }
-    return () => {
-      setError("");
-    };
-  });
+  const { setAuth, loading, setLoading, authError, setAuthError } =
+    useAuthStore();
 
   const router = useRouter();
+
+ useEffect(() => {
+  if (authError) {
+    toast.dismiss();
+    toast.error(authError);
+    setAuthError(null); 
+  }
+}, [authError]);
 
   const handleFormSubmit = async (data: LoginCredentials) => {
     setLoading(true);
     try {
-      const response = (await authService.login(data)) as AuthResponse &
-        FailedAuthResponse;
-      if (response.status === status.OK) {
-        setAuth(response.data, response.token);
-        router.push("/chats");
-      } else {
-        setError(response.error);
-      }
-    } catch (error: any) {
-      setError(error?.message || "An error occurred!");
+      const response = (await authService.login(data)) as AuthResponse;
+      setAuth(response.data);
+      toast.success("Login Successfull!")
+      router.push("/chats");
+    } catch (err) {      
+      setAuthError((err as Error).message)
     } finally {
       setLoading(false);
     }
@@ -54,8 +40,8 @@ function Login() {
   return (
     <LoginForm
       onSubmit={handleFormSubmit}
-      loading={useAuthStore((state) => state.loading)}
-      error={useAuthStore((state) => state.error)}
+      loading={loading}
+      error={authError}
     />
   );
 }

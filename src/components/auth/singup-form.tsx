@@ -16,7 +16,7 @@ import { Eye, EyeOff, Loader2Icon } from "lucide-react";
 interface SignupProps {
   onSubmit: (data: SignupCredentials) => void;
   loading?: boolean;
-  error?: string;
+  error?: string | null;
 }
 
 function SignupForm({ onSubmit, loading, error }: SignupProps) {

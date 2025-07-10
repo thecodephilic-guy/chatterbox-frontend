@@ -12,7 +12,8 @@ export interface User {
 export interface UsersResponse {
   status: number;
   message: string;
-  data: User[];
+  error?: string;
+  data: any;
 }
 
 export interface ActiveUsers {

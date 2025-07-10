@@ -3,75 +3,66 @@
 import React, { useEffect } from "react";
 import Sidebar from "@/components/dashboard/sidebar";
 import { useAuthStore } from "@/store/auth-store";
-import chatService from "@/services/chat-service";
 import { useChatStore } from "@/store/chat-store";
 import ChatWindow from "@/components/chat/chat-window";
-import useSocket from "@/hooks/useSocket";
 import SocketClient from "@/socket/socket-client";
-import { ActiveUsers } from "@/lib/types/user";
-import { ChatResponse } from "@/lib/types/chat";
 import status from "http-status";
 import { redirect } from "next/navigation";
+import { ChatResponse } from "@/lib/types/chat";
+import chatService from "@/services/chat-service";
+import ensureError from "@/lib/utils/ensureError";
 
 function Chats() {
-  const setChats = useChatStore((state) => state.setChats);
-  const currentUser = useAuthStore((state) => state.data);
-  const setAuthError = useAuthStore((state) => state.setError);
-  const setChatsLoading = useChatStore((state) => state.setLoading);
-  const selectedChat = useChatStore((state) => state.selectedChat);
-  const setActiveUsers = useChatStore((state) => state.setActiveUsers);
-  const { setTypingUsers } = useChatStore();
-  const logout = useAuthStore((state) => state.logout);
-
-  useSocket();
-
-  // logout();
+  const { selectedChat, setActiveUsers, setChats } =
+    useChatStore();
+  const loggedInUser = useAuthStore((state) => state.data);
+  const { setAuthError } = useAuthStore();
+  const socket = SocketClient.init();
 
   useEffect(() => {
-    const socket = SocketClient.getInstance();
-
-    if (!socket) return;
-
-    socket.on("user-typing", (userId) => {
-      setTypingUsers(userId, true); // global state update
+    socket.connect();
+    socket.on("users:active", (response) => {
+      if (response.status === "OK") {
+        setActiveUsers(response.data);
+      }
     });
-
-    socket.on("user-stop-typing", (userId) => {
-      setTypingUsers(userId, false); // global state update
-    });
-
     return () => {
-      socket.off("user-typing");
-      socket.off("user-stop-typing");
+      socket.off("users:active");
+      socket.disconnect();
     };
-  }, [selectedChat]);
-
-  useEffect(() => {
-    const socket = SocketClient.getInstance();
-
-    const handleGetUsers = (users: ActiveUsers[]) => {
-      setActiveUsers(users);
-    };
-
-    socket.on("get-users", handleGetUsers);
-
-    return () => {
-      socket.off("get-users", handleGetUsers);
-    };
-  }, [currentUser]);
+  }, [loggedInUser]);
 
   useEffect(() => {
     const fetchChats = async () => {
-      const chats: ChatResponse = await chatService.getAllChats();
-      if (chats.status === status.OK) {
-        setChats(chats.chats);
-      } else {
-        setAuthError(chats.message);
+      try {
+        const chats: ChatResponse = await chatService.getAllChats();
+        setChats(chats.data);
+      } catch (e) {
+        setAuthError((e as Error).message);
         redirect("/login");
       }
     };
     fetchChats();
-  }, [currentUser]);
+  }, [loggedInUser]);
+
+  // useEffect(() => {
+  //   const socket = SocketClient.getInstance();
+
+  //   if (!socket) return;
+
+  //   socket.on("user-typing", (userId) => {
+  //     setTypingUsers(userId, true); // global state update
+  //   });
+
+  //   socket.on("user-stop-typing", (userId) => {
+  //     setTypingUsers(userId, false); // global state update
+  //   });
+
+  //   return () => {
+  //     socket.off("user-typing");
+  //     socket.off("user-stop-typing");
+  //   };
+  // }, [selectedChat]);
 
   //here I have to write logic that if user is authenticated then only allow him to visit this route otherwise redirect him to login route.(later)
   return (
@@ -80,7 +71,7 @@ function Chats() {
         {/* Chat list sidebar */}
         <div
           className={`overflow-y-auto border-r ${
-            selectedChat?.userId ? "hidden md:block" : "block"
+            selectedChat?.chatId ? "hidden md:block" : "block"
           }`}
         >
           <Sidebar />
@@ -89,7 +80,7 @@ function Chats() {
         {/* Chat area */}
         <div
           className={`${
-            selectedChat?.userId ? "block" : "hidden md:block"
+            selectedChat?.chatId ? "block" : "hidden md:block"
           } md:col-span-2`}
         >
           <ChatWindow />

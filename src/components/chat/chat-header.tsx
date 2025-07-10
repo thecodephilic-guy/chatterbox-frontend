@@ -3,16 +3,16 @@ import { useEffect } from "react";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { getFallBack } from "@/lib/utils/getFallback";
 import { useChatStore } from "@/store/chat-store";
-import { formatLastSeen } from "@/lib/utils/date-formatter";
 import userService from "@/services/user-service";
+import { UsersResponse } from "@/lib/types/user";
+import TimeAgo from "@/lib/utils/format-time";
 
 function ChatHeader() {
   const selectedChat = useChatStore((state) => state.selectedChat);
-  const { activeUsers } = useChatStore();
   const { clearSelectedChat } = useChatStore();
-
+  const { activeUsers } = useChatStore();
   const [isOnline, setIsOnline] = useState<boolean | undefined>(false);
-  const [lastSeen, setLastSeen] = useState<Date | null>(null);
+   const [lastSeen, setLastSeen] = useState<Date | null>(null);
 
   useEffect(() => {
     if (!selectedChat?.userId) return;
@@ -28,11 +28,11 @@ function ChatHeader() {
         try {
           const response = (await userService.getLastSeen(
             selectedChat.userId
-          )) as { lastSeen: Date | null };
-          
-          if (response?.lastSeen !== null) {
-            setLastSeen(new Date(response.lastSeen));
-          }else{
+          )) as UsersResponse;
+
+          if (response) {
+            setLastSeen(new Date(response.data.lastSeen));
+          } else {
             setLastSeen(null);
           }
         } catch (err) {
@@ -44,17 +44,13 @@ function ChatHeader() {
     }
   }, [activeUsers, selectedChat?.userId]);
 
-  const handleBack = () => {
-    // window.history.back();
-    clearSelectedChat();
-  };
 
   return (
     <>
       <div className="bg-white shadow p-2 flex items-center">
         {/* Back button: visible only on mobile screens */}
         <button
-          onClick={handleBack}
+          onClick={() => clearSelectedChat()}
           className="mr-2 p-2 rounded hover:bg-gray-100 focus:outline-none md:hidden"
           aria-label="Back"
           type="button"
@@ -85,7 +81,7 @@ function ChatHeader() {
               isOnline ? "text-green-700" : "text-gray-500"
             }  -translate-y-1 pt-1`}
           >
-            {isOnline ? "Online" : lastSeen && formatLastSeen(lastSeen)}
+            {isOnline ? "Online" : lastSeen && <TimeAgo timestamp={lastSeen} />}
           </h2>
         </div>
       </div>
