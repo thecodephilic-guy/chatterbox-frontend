@@ -1,7 +1,8 @@
 export interface ServerToClientEvents {
   "message:receive": (response: SocketResponse) => void;
   "users:active": (response: SocketResponse) => void;
-  "users:typing": (response: SocketResponse) => void;
+  "user:typing": (response: SocketResponse) => void;
+  "user:notTyping": (response: SocketResponse) => void;
 }
 
 export interface ClientToServerEvents {
@@ -11,6 +12,8 @@ export interface ClientToServerEvents {
   ) => void;
 
   "user:typing": (payload: TypingPayload) => void
+  "user:notTyping": (payload: TypingPayload) => void
+
 }
 
 export interface SocketResponse {
@@ -21,13 +24,12 @@ export interface SocketResponse {
 }
 
 interface MessagePayload {
-  chatId: string;
+  chatId?: string;
   receiverId: string;
   content: string;
   messageType?: "text" | "image" | "video";
 }
 
 interface TypingPayload {
-  senderId: string;
   receiverId: string;
 }

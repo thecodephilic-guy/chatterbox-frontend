@@ -8,6 +8,9 @@ import {
 } from "@/components/ui/popover";
 import { Smile, SendHorizonal } from "lucide-react";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
+import SocketClient from "@/socket/socket-client";
+import { useChatStore } from "@/store/chat-store";
+import { useDebounce } from "@/hooks/useDebounce";
 
 type ChatInputProps = {
   onSendMessage: (message: string) => void;
@@ -16,10 +19,31 @@ type ChatInputProps = {
 const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const socket = SocketClient.init();
+  const { selectedChat } = useChatStore();
 
   const handleEmojiClick = (emojiData: EmojiClickData) => {
     setMessage((prev) => prev + emojiData.emoji);
     inputRef.current?.focus();
+  };
+
+  const handleTyping = () => {
+    if (!selectedChat?.userId) return;
+    socket.emit("user:typing", { receiverId: selectedChat.userId });
+  };
+
+  const handleStopTyping = () => {
+    if(!selectedChat?.userId) return
+    socket.emit("user:notTyping", { receiverId: selectedChat.userId });
+  };
+
+  const debouncedStopTyping = useDebounce(handleStopTyping, 500);
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setMessage(e.target.value);
+    handleTyping();
+    debouncedStopTyping();
   };
 
   const handleSend = () => {
@@ -54,7 +78,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
           className="rounded-lg px-4 py-2 text-sm w-full placeholder:text-gray-400 border-gray-300 bg-gray-100 focus-visible:ring-0"
           placeholder="Type your message..."
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => handleOnChange(e)}
           onKeyDown={handleKeyDown}
         />
       </div>

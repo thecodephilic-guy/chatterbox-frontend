@@ -67,6 +67,24 @@ class Chat {
       throw ensureError(e);
     }
   }
+
+  async findChatId(receiverId: string) {
+    try{
+      if(!receiverId){
+        throw new Error("No receiverId provided");
+      }
+      const res = await apiClient.get(`/chat/users/${receiverId}`);
+      if(res.data.status === status.CONFLICT){
+        return "NOT_FOUND";
+      }
+      return res.data;
+    }catch(e: any){
+      if (e.response && e.response.data && e.response.data.error) {
+        throw new Error(e.response.data.error);
+      }
+      throw ensureError(e);
+    }
+  }
 }
 
 const chatService = new Chat();

@@ -1,37 +1,39 @@
-import React, { useState } from "react";
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { getFallBack } from "@/lib/utils/getFallback";
 import { useChatStore } from "@/store/chat-store";
 import userService from "@/services/user-service";
 import { UsersResponse } from "@/lib/types/user";
 import TimeAgo from "@/lib/utils/format-time";
+import SocketClient from "@/socket/socket-client";
 
 function ChatHeader() {
   const selectedChat = useChatStore((state) => state.selectedChat);
-  const { clearSelectedChat } = useChatStore();
-  const { activeUsers } = useChatStore();
+  const { clearSelectedChat, activeUsers, selectedNewChat } = useChatStore();
   const [isOnline, setIsOnline] = useState<boolean | undefined>(false);
-   const [lastSeen, setLastSeen] = useState<Date | null>(null);
+  const [lastSeen, setLastSeen] = useState<Date | null>(null);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const socket = SocketClient.init();
+
+  const activeChat = selectedChat || selectedNewChat;
 
   useEffect(() => {
-    if (!selectedChat?.userId) return;
+    if (!activeChat) return;
 
     const online = activeUsers?.some(
-      (user) => user.userId === selectedChat?.userId
+      (user) => user.userId === activeChat.userId
     );
     setIsOnline(online);
 
-    //if not online then fetch lastSeen:
     if (!online) {
       (async () => {
         try {
           const response = (await userService.getLastSeen(
-            selectedChat.userId
+            activeChat.userId
           )) as UsersResponse;
 
           if (response) {
-            setLastSeen(new Date(response.data.lastSeen));
+            setLastSeen(new Date(response.data?.lastSeen));
           } else {
             setLastSeen(null);
           }
@@ -40,22 +42,41 @@ function ChatHeader() {
         }
       })();
     } else {
-      setLastSeen(null); // Clear lastSeen if user is online
+      setLastSeen(null);
     }
-  }, [activeUsers, selectedChat?.userId]);
+  }, [activeUsers, activeChat?.userId]);
 
+  useEffect(() => {
+    const handleTyping = (response: any) => {
+      if (response?.data?.userId === activeChat?.userId) {
+        setIsTyping(true);
+      }
+    };
+
+    const handleNotTyping = (response: any) => {
+      if (response?.data?.userId === activeChat?.userId) {
+        setIsTyping(false);
+      }
+    };
+
+    socket.on("user:typing", handleTyping);
+    socket.on("user:notTyping", handleNotTyping);
+
+    return () => {
+      socket.off("user:typing", handleTyping);
+      socket.off("user:notTyping", handleNotTyping);
+    };
+  }, [activeChat?.userId]);
 
   return (
     <>
       <div className="bg-white shadow p-2 flex items-center">
-        {/* Back button: visible only on mobile screens */}
         <button
           onClick={() => clearSelectedChat()}
           className="mr-2 p-2 rounded hover:bg-gray-100 focus:outline-none md:hidden"
           aria-label="Back"
           type="button"
         >
-          {/* Simple left arrow SVG */}
           <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
             <path
               d="M12 15l-5-5 5-5"
@@ -68,20 +89,23 @@ function ChatHeader() {
         </button>
         <div className="relative">
           <Avatar className="size-10 border-2">
-            {/* <AvatarImage src="..." /> */}
             <AvatarFallback className="text-gray-700">
-              {getFallBack(selectedChat?.name ?? "")}
+              {getFallBack(activeChat?.name ?? "")}
             </AvatarFallback>
           </Avatar>
         </div>
         <div className="pl-3">
-          <h1 className="text-sm">{selectedChat?.name}</h1>
+          <h1 className="text-sm">{activeChat?.name}</h1>
           <h2
             className={`text-xs ${
               isOnline ? "text-green-700" : "text-gray-500"
             }  -translate-y-1 pt-1`}
           >
-            {isOnline ? "Online" : lastSeen && <TimeAgo timestamp={lastSeen} />}
+            {isOnline
+              ? isTyping
+                ? "Typing..."
+                : "Online"
+              : lastSeen && <TimeAgo timestamp={lastSeen} />}
           </h2>
         </div>
       </div>

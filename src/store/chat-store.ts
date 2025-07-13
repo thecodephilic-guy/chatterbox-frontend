@@ -9,6 +9,7 @@ type ChatStore = {
   searchTerm: string;
   loading: boolean;
   selectedChat: Chat | null;
+  selectedNewChat: User | null;
   activeUsers: ActiveUsers[] | [];
   typingUsers: string[] | null;
   newChatUsers: User[];
@@ -22,6 +23,7 @@ type ChatActions = {
   clearSearch: () => void;
   setLoading: (isLoading: boolean) => void;
   setSelectedChat: (chat: Chat) => void;
+  setSelectedNewChat: (user: User | null) => void;
   setActiveUsers: (activeUsersData: ActiveUsers[]) => void;
   clearSelectedChat: () => void;
   setTypingUsers: (userId: string, isTyping: boolean) => void;
@@ -38,6 +40,7 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
   searchTerm: "",
   loading: false,
   selectedChat: null,
+  selectedNewChat: null,
   activeUsers: [],
   typingUsers: null,
   newChatUsers: [],
@@ -74,6 +77,9 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
     set({
       selectedChat: chat,
     }),
+
+  setSelectedNewChat: (user: User | null) => set({ selectedNewChat: user }),
+
   setActiveUsers: (activeUsers) => set({ activeUsers }),
   clearSelectedChat: () => set({ selectedChat: null }),
 
@@ -118,14 +124,15 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
 
     if (!selectedChat) return;
 
-
     const updatedChats = chats.map((chat) =>
-      chat.chatId === selectedChat.chatId ? { ...chat, lastMessage: message } : chat
+      chat.chatId === selectedChat.chatId
+        ? { ...chat, lastMessage: message }
+        : chat
     );
 
     set({
       chats: updatedChats,
       filteredChats: updatedChats,
     });
-  }
+  },
 }));

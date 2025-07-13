@@ -1,8 +1,8 @@
 export interface User {
-  id: string;
+  userId: string;
   name: string;
   username: string;
-  gender: string;
+  gender: 'male' | 'female' | 'other';
   lastSeen: Date;
   updatedAt: Date;
   createdAt: Date;

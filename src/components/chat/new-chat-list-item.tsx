@@ -2,6 +2,7 @@ import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { getFallBack } from "@/lib/utils/getFallback";
 import { formatDistanceToNowStrict } from "date-fns";
+import TimeAgo from "@/lib/utils/format-time";
 
 interface NewChatListItemProps {
   name: string;
@@ -12,7 +13,7 @@ interface NewChatListItemProps {
 
 function NewChatListItem({ name, username, lastSeen, handleClick }: NewChatListItemProps) {
   const lastSeenText = lastSeen
-    ? `${formatDistanceToNowStrict(new Date(lastSeen), { addSuffix: true })}`
+    ? <TimeAgo timestamp={lastSeen} />
     : "Offline";
 
   return (

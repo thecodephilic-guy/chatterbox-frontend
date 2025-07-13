@@ -6,27 +6,42 @@ import ChatListItemSkeleton from "./skeletons/chat-list-item";
 import { Button } from "../ui/button";
 import { CircleArrowLeft } from "lucide-react";
 import { Chat } from "@/lib/types/chat";
+import { User } from "@/lib/types/user";
 import chatService from "@/services/chat-service";
+import status from "http-status";
 
 function ChatList() {
   const chats = useChatStore((state) => state.filteredChats);
   const newUsers = useChatStore((state) => state.filteredNewChatUsers);
-  const { setNewChatUsers } = useChatStore();
+  const { setNewChatUsers, setSelectedNewChat, clearSelectedChat } =
+    useChatStore();
   const isLoading = useChatStore((state) => state.loading);
   const setSelectedChat = useChatStore((state) => state.setSelectedChat);
 
-  const handleChatClick = async (chat: Chat) => {
-    //this function will be executed when user clicks on a particular chat
-    //what it should do?
-    //1. It should set the value for selected chat.
-    //2. Take the chatId and make api call for marking messages as read, becuause opening chat will make messages seen.
-    setSelectedChat(chat);
-    // try {
-    //   await chatService.markMessagesSeen(chat.chatId);
-    // } catch (err) {
-    //   console.error("error in updating seen status:" + err);
-    // }
-  };
+  const handleSelectChat = React.useCallback(
+    (chat: Chat) => {
+      setSelectedChat(chat);
+    },
+    [setSelectedChat]
+  );
+
+  const handleSelectNewChat = React.useCallback(
+    async (user: User) => {
+      const chatResponse = await chatService.findChatId(user.userId);
+      if (chatResponse.status === status.OK && chatResponse.data.existingChat) {
+        const chatId = chatResponse.data.chatId;
+        const chatToBeSelected = chats.find((chat) => chat.chatId === chatId);
+        if (!chatToBeSelected) return;
+        setSelectedChat(chatToBeSelected);
+        setNewChatUsers([]);
+        return;
+      }
+
+      clearSelectedChat();
+      setSelectedNewChat(user);
+    },
+    [setSelectedNewChat, clearSelectedChat, setSelectedChat, chats]
+  );
 
   return (
     <>
@@ -41,7 +56,7 @@ function ChatList() {
                 name={chat.name}
                 lastMessage={chat.lastMessage}
                 unreadCount={chat.unreadCount}
-                handleClick={() => handleChatClick(chat)}
+                handleClick={() => handleSelectChat(chat)}
               />
             )
           )
@@ -52,11 +67,11 @@ function ChatList() {
             </Button>
             {newUsers.map((user) => (
               <NewChatListItem
-                key={user.id}
+                key={user.userId}
                 name={user.name}
                 username={user.username}
                 lastSeen={user.lastSeen}
-                handleClick={() => console.log("Clicked")}
+                handleClick={() => handleSelectNewChat(user)}
               />
             ))}
           </div>

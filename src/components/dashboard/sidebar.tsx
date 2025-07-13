@@ -14,7 +14,6 @@ function Sidebar() {
 
   const handleOnClick = async () => {
     const response = await userService.fetchNewUsers() as UsersResponse;
-    response.data = response.data.filter((user) => user.id !== loggedInUser?.id); //removing self
     setNewChatUsers(response.data);
   }
   
