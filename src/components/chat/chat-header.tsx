@@ -9,7 +9,7 @@ import SocketClient from "@/socket/socket-client";
 
 function ChatHeader() {
   const selectedChat = useChatStore((state) => state.selectedChat);
-  const { clearSelectedChat, activeUsers, selectedNewChat } = useChatStore();
+  const { activeUsers, selectedNewChat, setSelectedChat, setSelectedNewChat } = useChatStore();
   const [isOnline, setIsOnline] = useState<boolean | undefined>(false);
   const [lastSeen, setLastSeen] = useState<Date | null>(null);
   const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -68,11 +68,16 @@ function ChatHeader() {
     };
   }, [activeChat?.userId]);
 
+  const handleBack = () => {
+    setSelectedChat(null);
+    setSelectedNewChat(null);
+  }
+
   return (
     <>
       <div className="bg-white shadow p-2 flex items-center">
         <button
-          onClick={() => clearSelectedChat()}
+          onClick={handleBack}
           className="mr-2 p-2 rounded hover:bg-gray-100 focus:outline-none md:hidden"
           aria-label="Back"
           type="button"

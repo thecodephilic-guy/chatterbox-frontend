@@ -25,7 +25,7 @@ type ChatActions = {
   setIsNewChatMode: (mode: boolean) => void;
   clearSearch: () => void;
   setLoading: (isLoading: boolean) => void;
-  setSelectedChat: (chat: Chat) => void;
+  setSelectedChat: (chat: Chat | null) => void;
   setSelectedNewChat: (user: User | null) => void;
   setActiveUsers: (activeUsersData: ActiveUsers[]) => void;
   clearSelectedChat: () => void;
@@ -80,7 +80,7 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
       loading: isLoading,
     }),
 
-  setSelectedChat: (chat: Chat) =>
+  setSelectedChat: (chat: Chat | null) =>
     set({
       selectedChat: chat,
     }),

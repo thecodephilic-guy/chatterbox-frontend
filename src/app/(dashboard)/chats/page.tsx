@@ -11,7 +11,7 @@ import { ChatResponse } from "@/lib/types/chat";
 import chatService from "@/services/chat-service";
 
 function Chats() {
-  const { selectedChat, setActiveUsers, setChats } =
+  const { selectedChat, setActiveUsers, setChats, selectedNewChat } =
     useChatStore();
   const loggedInUser = useAuthStore((state) => state.data);
   const { setAuthError } = useAuthStore();
@@ -43,33 +43,13 @@ function Chats() {
     fetchChats();
   }, [loggedInUser]);
 
-  // useEffect(() => {
-  //   const socket = SocketClient.getInstance();
-
-  //   if (!socket) return;
-
-  //   socket.on("user-typing", (userId) => {
-  //     setTypingUsers(userId, true); // global state update
-  //   });
-
-  //   socket.on("user-stop-typing", (userId) => {
-  //     setTypingUsers(userId, false); // global state update
-  //   });
-
-  //   return () => {
-  //     socket.off("user-typing");
-  //     socket.off("user-stop-typing");
-  //   };
-  // }, [selectedChat]);
-
-  //here I have to write logic that if user is authenticated then only allow him to visit this route otherwise redirect him to login route.(later)
   return (
     <>
       <div className="h-full grid grid-cols-1 md:grid-cols-3">
         {/* Chat list sidebar */}
         <div
           className={`overflow-y-auto border-r ${
-            selectedChat?.chatId ? "hidden md:block" : "block"
+            selectedChat?.chatId || selectedNewChat?.userId ? "hidden md:block" : "block"
           }`}
         >
           <Sidebar />
@@ -78,7 +58,7 @@ function Chats() {
         {/* Chat area */}
         <div
           className={`${
-            selectedChat?.chatId ? "block" : "hidden md:block"
+            selectedChat?.chatId || selectedNewChat?.userId? "block" : "hidden md:block"
           } md:col-span-2`}
         >
           <ChatWindow />
