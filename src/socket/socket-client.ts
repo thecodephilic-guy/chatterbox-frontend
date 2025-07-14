@@ -1,7 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import { ServerToClientEvents, ClientToServerEvents } from './socket-events';
 
-const SERVER_URL = process.env.SOCKET_URL || 'http://localhost:8080/';
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_ENDPOINT || 'http://localhost:8080';
 
 class SocketClient {
   private static socket: Socket<ServerToClientEvents, ClientToServerEvents>;
