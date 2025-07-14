@@ -1,7 +1,11 @@
 import { io, Socket } from 'socket.io-client';
 import { ServerToClientEvents, ClientToServerEvents } from './socket-events';
 
-const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_ENDPOINT || 'http://localhost:8080';
+let SERVER_URL = process.env.NEXT_PUBLIC_SERVER_ENDPOINT || 'http://localhost:8080';
+
+if (SERVER_URL.endsWith("/api")) {
+  SERVER_URL = SERVER_URL.slice(0, -4);
+}
 
 class SocketClient {
   private static socket: Socket<ServerToClientEvents, ClientToServerEvents>;
