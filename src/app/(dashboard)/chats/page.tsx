@@ -6,11 +6,9 @@ import { useAuthStore } from "@/store/auth-store";
 import { useChatStore } from "@/store/chat-store";
 import ChatWindow from "@/components/chat/chat-window";
 import SocketClient from "@/socket/socket-client";
-import status from "http-status";
 import { redirect } from "next/navigation";
 import { ChatResponse } from "@/lib/types/chat";
 import chatService from "@/services/chat-service";
-import ensureError from "@/lib/utils/ensureError";
 
 function Chats() {
   const { selectedChat, setActiveUsers, setChats } =

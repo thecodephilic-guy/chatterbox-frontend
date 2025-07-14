@@ -1,10 +1,12 @@
 import { create } from "zustand";
 import { Chat } from "@/lib/types/chat";
 import { ActiveUsers, User } from "@/lib/types/user";
+import userService from "@/services/user-service";
 
 type ChatStore = {
   chats: Chat[];
   filteredChats: Chat[];
+  isNewChatMode: boolean;
   chatError: string;
   searchTerm: string;
   loading: boolean;
@@ -20,6 +22,7 @@ type ChatActions = {
   setChats: (chats: Chat[]) => void;
   setChatError: (message: string) => void;
   setSearchTerm: (term: string) => void;
+  setIsNewChatMode: (mode: boolean) => void;
   clearSearch: () => void;
   setLoading: (isLoading: boolean) => void;
   setSelectedChat: (chat: Chat) => void;
@@ -30,6 +33,7 @@ type ChatActions = {
   setNewChatUsers: (users: User[]) => void;
   updateUnreadCount: () => void;
   updateLastMessage: (message: string) => void;
+  searchNewUsers: (term: string) => void;
 };
 
 export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
@@ -37,6 +41,7 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
   chats: [],
   filteredChats: [],
   chatError: "",
+  isNewChatMode: false,
   searchTerm: "",
   loading: false,
   selectedChat: null,
@@ -55,8 +60,10 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
 
   setChatError: (message) => set({ chatError: message }),
 
+  setIsNewChatMode: (mode) => set({ isNewChatMode: mode }),
+
   setSearchTerm: (term) => {
-    const { chats } = get(); //to get all the chats from store
+    const { chats } = get();
     const filtered = chats.filter((chat) =>
       chat.name.toLowerCase().includes(term.toLowerCase())
     );
@@ -65,8 +72,8 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
   },
 
   clearSearch: () => {
-    const { chats } = get();
-    set({ searchTerm: "", filteredChats: chats });
+    const { chats, newChatUsers } = get();
+    set({ searchTerm: "", filteredChats: chats, filteredNewChatUsers: newChatUsers });
   },
   setLoading: (isLoading) =>
     set({
@@ -134,5 +141,22 @@ export const useChatStore = create<ChatStore & ChatActions>((set, get) => ({
       chats: updatedChats,
       filteredChats: updatedChats,
     });
+  },
+
+  searchNewUsers: async (term: string) => {
+    try {
+      const response = await userService.searchUser(term);
+      set({
+        newChatUsers: response,
+        filteredNewChatUsers: response,
+        chatError: "",
+      });
+    } catch (error) {
+      set({
+        newChatUsers: [],
+        filteredNewChatUsers: [],
+        chatError: (error as Error).message || "Failed to search users",
+      });
+    }
   },
 }));

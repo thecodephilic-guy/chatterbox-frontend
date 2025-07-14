@@ -1,18 +1,28 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useChatStore } from "@/store/chat-store";
+import { useDebounce } from "@/hooks/useDebounce";
 
 function SearchBar() {
-  const setSearchTerm = useChatStore((state) => state.setSearchTerm);
-  const searchTerm = useChatStore((state) => state.searchTerm);
-  const clearSearch = useChatStore((state) => state.clearSearch);
+  const [localTerm, setLocalTerm] = useState("");
+  const {isNewChatMode, setSearchTerm, clearSearch, searchNewUsers} = useChatStore();
+
+  const debouncedSearchUsers = useDebounce((term: string) => {
+    if (term.trim() !== "") {
+      searchNewUsers(term);
+    }
+  }, 500);
 
   useEffect(() => {
-    if (searchTerm.length === 0) {
+    if (localTerm.trim() === "") {
       clearSearch();
+    } else if (!isNewChatMode) {
+      setSearchTerm(localTerm);
+    } else {
+      debouncedSearchUsers(localTerm);
     }
-  }, [searchTerm.length]);
+  }, [localTerm]);
 
   return (
     <>
@@ -23,8 +33,8 @@ function SearchBar() {
             type="text"
             className="border-gray-300 bg-gray-100 rounded-sm pl-10 placeholder:text-gray-400 focus-visible:ring-0 font-medium"
             placeholder="Search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={localTerm}
+            onChange={(e) => setLocalTerm(e.target.value)}
           />
         </div>
       </div>

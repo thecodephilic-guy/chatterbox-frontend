@@ -11,8 +11,8 @@ import chatService from "@/services/chat-service";
 import status from "http-status";
 
 function ChatList() {
-  const chats = useChatStore((state) => state.filteredChats);
-  const newUsers = useChatStore((state) => state.filteredNewChatUsers);
+  const newUsers = useChatStore((state) => state.filteredNewChatUsers) || [];
+  const chats = useChatStore((state) => state.filteredChats) || [];
   const { setNewChatUsers, setSelectedNewChat, clearSelectedChat } =
     useChatStore();
   const isLoading = useChatStore((state) => state.loading);
